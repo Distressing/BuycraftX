@@ -14,7 +14,8 @@ public class QueuedCommandExecutor implements CommandExecutor, Runnable {
     private final boolean blocking;
     private final Set<ToRunQueuedCommand> commandQueue = new LinkedHashSet<>();
     private final PostCompletedCommandsTask completedCommandsTask;
-    private int runMaxCommandsBlocking = 10;
+    private int runMaxCommandsBlocking = 2;
+    private int lastRun = 0;
 
     public QueuedCommandExecutor(IBuycraftPlatform platform, PostCompletedCommandsTask completedCommandsTask) {
         this.platform = platform;
@@ -31,6 +32,14 @@ public class QueuedCommandExecutor implements CommandExecutor, Runnable {
 
     @Override
     public void run() {
+
+        lastRun ++;
+
+        if(lastRun % 5 !=0)
+            return;
+
+        lastRun = 0;
+
         List<ToRunQueuedCommand> runThisTick = new ArrayList<>();
         synchronized (commandQueue) {
             ArrayList<Integer> queuedCommandIds = new ArrayList<>();
